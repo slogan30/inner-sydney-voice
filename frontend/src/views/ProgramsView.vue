@@ -3,8 +3,9 @@ import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import ProgramCard from '@/components/ProgramCard.vue'
 import { useProgramStore } from '@/stores/programStore'
+import ProgramDialog from '@/components/ProgramDialog.vue'
 
-// Use the program store
+// Use the store
 const programStore = useProgramStore()
 const { programs } = storeToRefs(programStore)
 
@@ -15,11 +16,15 @@ onMounted(async () => {
 
 <template>
   <div class="container mx-auto px-4 py-8">
-    <div class="mb-8">
-      <h1 class="text-4xl font-bold text-gray-900 mb-2">Programs</h1>
-      <p class="text-lg text-gray-600">
-        Explore our comprehensive collection of development programs
-      </p>
+    <div class="mb-8 flex justify-between items-start">
+      <div>
+        <h1 class="text-4xl font-bold text-gray-900 mb-2">Programs</h1>
+        <p class="text-lg text-gray-600">
+          Explore our comprehensive collection of development programs
+        </p>
+      </div>
+
+      <ProgramDialog />
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">

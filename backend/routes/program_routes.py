@@ -9,10 +9,22 @@ from config import supabase_admin
 
 router = APIRouter()
 
-class ProgramResponse(BaseModel):
+class ProgramCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    date_interval: Optional[str] = None
+    location: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    website_url: Optional[str] = None
+    provider_id: Optional[str] = None
+
+class Program(BaseModel):
     program_id: str
     name: str
-    description: str
+    description: Optional[str] = None
     start_date: Optional[date] = None
     end_date: Optional[date] = None
     date_interval: Optional[str] = None
@@ -22,6 +34,73 @@ class ProgramResponse(BaseModel):
     website_url: Optional[str] = None
     provider_id: Optional[str] = None
     provider_name: Optional[str] = None
+
+
+
+@router.post("/api/programs", response_model=Program)
+async def create_program(program_data: ProgramCreate):
+    try:
+        # Validate that provider exists if provider_id is provided
+        if program_data.provider_id:
+            provider_response = supabase_admin.table("providers").select("provider_id, name").eq("provider_id", program_data.provider_id).execute()
+            
+            if not provider_response.data:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Provider with ID {program_data.provider_id} not found"
+                )
+        
+        # Prepare data for insertion (exclude None values to let database handle defaults)
+        insert_data = program_data.model_dump(exclude_none=True)
+
+        if 'start_date' in insert_data:
+            insert_data['start_date'] = insert_data['start_date'].isoformat()
+        if 'end_date' in insert_data:
+            insert_data['end_date'] = insert_data['end_date'].isoformat()
+        
+        # Insert the new program
+        response = supabase_admin.table("programs").insert(insert_data).execute()
+        
+        # Check if the insertion was successful
+        if response.data is None or not response.data:
+            raise HTTPException(status_code=500, detail="Failed to create program")
+        
+        # Get the created program with provider information
+        created_program_id = response.data[0]["program_id"]
+        
+        # Fetch the complete program data with provider name
+        program_response = supabase_admin.table("programs").select(
+            "*, providers(provider_id, name)"
+        ).eq("program_id", created_program_id).execute()
+        
+        if not program_response.data:
+            raise HTTPException(status_code=500, detail="Failed to fetch created program")
+        
+        program_dict = dict(program_response.data[0])
+        
+        # Handle provider name
+        if program_dict.get('providers'):
+            program_dict['provider_name'] = program_dict['providers']['name']
+            del program_dict['providers']
+        else:
+            program_dict['provider_name'] = None
+        
+        return Program(**program_dict)
+    
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
+    except Exception as e:
+        # Log the error for debugging
+        print(f"Error creating program: {str(e)}")
+        print(traceback.format_exc())
+        
+        # Return appropriate HTTP error
+        raise HTTPException(
+            status_code=500, 
+            detail="Internal server error while creating program"
+        )
+
 
 @router.get("/api/programs")
 async def list_programs():
@@ -46,7 +125,7 @@ async def list_programs():
         )
     
 
-@router.get("/api/programs/{program_id}", response_model=ProgramResponse)
+@router.get("/api/programs/{program_id}", response_model=Program)
 async def get_program(program_id: str):
     try:
         response = supabase_admin.table("programs").select(
@@ -72,7 +151,7 @@ async def get_program(program_id: str):
         else:
             program_dict['provider_name'] = None
         print(program_dict)
-        return ProgramResponse(**program_dict)
+        return Program(**program_dict)
     
     except HTTPException:
         # Re-raise HTTP exceptions (like 404)

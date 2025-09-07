@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { listProgramsAPI, getProgramAPI } from '@/apis/programAPI'
+import {
+  listProgramsAPI,
+  getProgramAPI,
+  createProgramAPI,
+  type ProgramCreatePayload,
+} from '@/apis/programAPI'
 
 export interface Program {
   program_id: string
@@ -31,10 +36,18 @@ export const useProgramStore = defineStore('program', () => {
     program.value = response
   }
 
+  async function createProgram(payload: ProgramCreatePayload) {
+    const created = await createProgramAPI(payload)
+    // Prepend or append; for now, prepend to show newest first
+    programs.value = [created, ...programs.value]
+    return created
+  }
+
   return {
     programs,
     program,
     listPrograms,
     getProgram,
+    createProgram,
   }
 })
