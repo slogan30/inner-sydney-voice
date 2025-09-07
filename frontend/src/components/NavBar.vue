@@ -12,10 +12,11 @@ import { Button } from '@/components/ui/button'
     <!-- Navigation buttons -->
     <div class="flex items-center gap-4">
       <RouterLink to="/programs">
-        <Button variant="ghost">Program</Button>
+        <Button variant="ghost">Programs</Button>
       </RouterLink>
-
-      <Button variant="ghost">Providers</Button>
+      <RouterLink to="/providers">
+        <Button variant="ghost">Providers</Button>
+      </RouterLink>
       <Button variant="ghost" size="icon">
         <svg
           xmlns="http://www.w3.org/2000/svg"

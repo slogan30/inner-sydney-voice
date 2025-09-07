@@ -1,9 +1,3 @@
-<script setup lang="ts">
-import ProgramCard from '@/components/ProgramCard.vue'
-</script>
+<script setup lang="ts"></script>
 
-<template>
-  Home Page
-
-  <ProgramCard />
-</template>
+<template>Home Page</template>
