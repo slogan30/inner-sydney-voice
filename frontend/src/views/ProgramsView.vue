@@ -1,10 +1,16 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import ProgramCard from '@/components/ProgramCard.vue'
 import { useProgramStore } from '@/stores/programStore'
 
 // Use the program store
 const programStore = useProgramStore()
-const programs = programStore.getPrograms()
+const { programs } = storeToRefs(programStore)
+
+onMounted(async () => {
+  await programStore.listPrograms()
+})
 </script>
 
 <template>
@@ -19,11 +25,17 @@ const programs = programStore.getPrograms()
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       <ProgramCard
         v-for="program in programs"
-        :key="program.title"
-        :title="program.title"
-        :description="program.description"
-        :start-date="program.startDate"
-        :location="program.location"
+        :key="program.program_id"
+        :program-id="program.program_id"
+        :title="program.name ?? ''"
+        :description="program.description || ''"
+        :start-date="program.start_date ?? ''"
+        :end-date="program.end_date ?? ''"
+        :date-interval="program.date_interval ?? ''"
+        :location="program.location ?? ''"
+        :email="program.email"
+        :phone="program.phone"
+        :website-url="program.website_url"
       />
     </div>
   </div>

@@ -1,10 +1,16 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import ProviderCard from '@/components/ProviderCard.vue'
 import { useProviderStore } from '@/stores/providerStore'
 
-// Use the provider store
+// Use the program store
 const providerStore = useProviderStore()
-const providers = providerStore.getProviders()
+const { providers } = storeToRefs(providerStore)
+
+onMounted(async () => {
+  await providerStore.listProviders()
+})
 </script>
 
 <template>
@@ -19,9 +25,11 @@ const providers = providerStore.getProviders()
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       <ProviderCard
         v-for="provider in providers"
-        :key="provider.name"
-        :name="provider.name"
-        :description="provider.description"
+        :key="provider.provider_id"
+        :provider_id="provider.provider_id ?? ''"
+        :name="provider.name ?? ''"
+        :description="provider.description ?? ''"
+        :programs="provider.programs"
       />
     </div>
   </div>

@@ -1,18 +1,31 @@
 <script setup lang="ts">
 import { Card, CardHeader, CardTitle } from '@/components/ui/card'
+import { useRouter } from 'vue-router'
 
 interface ProgramCardProps {
+  programId: string
   title: string
   description: string
-  startDate: string
-  location: string
+  startDate?: string | null
+  location?: string | null
+  email?: string | null
+  phone?: string | null
+  websiteUrl?: string | null
 }
 
-defineProps<ProgramCardProps>()
+const props = defineProps<ProgramCardProps>()
+const router = useRouter()
+
+const handleClick = () => {
+  router.push(`/programs/${props.programId}`)
+}
 </script>
 
 <template>
-  <Card class="w-full max-w-md h-38">
+  <Card
+    class="w-full max-w-md h-38 cursor-pointer hover:shadow-lg transition-shadow"
+    @click="handleClick"
+  >
     <CardHeader class="flex flex-row items-start space-y-0 pb-4 pt-4 h-full">
       <!-- Avatar circle -->
       <div class="w-12 h-12 bg-black rounded-full mr-4 flex-shrink-0 mt-3"></div>
