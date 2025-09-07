@@ -37,7 +37,7 @@ const goBack = () => {
             d="M15 19l-7-7 7-7"
           />
         </svg>
-        Back to Providers
+        Providers
       </Button>
     </div>
 

@@ -22,6 +22,10 @@ onMounted(async () => {
 const goBack = () => {
   router.push('/programs')
 }
+
+const goToProvider = (providerId: string) => {
+  router.push(`/providers/${providerId}`)
+}
 </script>
 
 <template>
@@ -37,7 +41,7 @@ const goBack = () => {
             d="M15 19l-7-7 7-7"
           />
         </svg>
-        Back to Programs
+        Programs
       </Button>
     </div>
 
@@ -51,6 +55,17 @@ const goBack = () => {
 
             <div class="flex-1">
               <CardTitle class="text-3xl font-bold mb-2">{{ program.name }}</CardTitle>
+              <div v-if="program.provider_name" class="mt-2">
+                <span class="text-sm text-muted-foreground">Provider: </span>
+                <button
+                  v-if="program.provider_id"
+                  @click="goToProvider(program.provider_id)"
+                  class="text-lg text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                >
+                  {{ program.provider_name }}
+                </button>
+                <span v-else class="text-lg">{{ program.provider_name }}</span>
+              </div>
             </div>
           </div>
         </CardHeader>

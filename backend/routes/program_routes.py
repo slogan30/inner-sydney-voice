@@ -21,6 +21,7 @@ class ProgramResponse(BaseModel):
     email: Optional[str] = None
     website_url: Optional[str] = None
     provider_id: Optional[str] = None
+    provider_name: Optional[str] = None
 
 @router.get("/api/programs")
 async def list_programs():
@@ -46,9 +47,11 @@ async def list_programs():
     
 
 @router.get("/api/programs/{program_id}", response_model=ProgramResponse)
-async def get_program_by_id(program_id: str):
+async def get_program(program_id: str):
     try:
-        response = supabase_admin.table("programs").select("*").eq("program_id", program_id).execute()
+        response = supabase_admin.table("programs").select(
+            "*, providers(provider_id, name)"
+        ).eq("program_id", program_id).execute()
         
         # Check if the query was successful
         if response.data is None:
@@ -60,7 +63,16 @@ async def get_program_by_id(program_id: str):
         
         # Return the first (and should be only) result
         program_data = response.data[0]
-        return ProgramResponse(**program_data)
+
+        program_dict = dict(program_data)
+        if program_dict.get('providers'):
+            program_dict['provider_name'] = program_dict['providers']['name']
+            # Remove the nested providers object as it's not needed in the response model
+            del program_dict['providers']
+        else:
+            program_dict['provider_name'] = None
+        print(program_dict)
+        return ProgramResponse(**program_dict)
     
     except HTTPException:
         # Re-raise HTTP exceptions (like 404)

@@ -14,6 +14,7 @@ export interface Program {
   email?: string | null
   website_url?: string | null
   provider_id?: string | null
+  provider_name?: string | null
 }
 
 export const useProgramStore = defineStore('program', () => {

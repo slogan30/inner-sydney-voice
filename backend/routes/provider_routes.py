@@ -48,7 +48,7 @@ async def list_providers():
     
 
 @router.get("/api/providers/{provider_id}", response_model=ProviderWithPrograms)
-async def get_provider_by_id(provider_id: str):
+async def get_provider(provider_id: str):
     try:
         response = supabase_admin.table("providers").select(
             "provider_id, name, description, programs(program_id, name)"
@@ -79,7 +79,6 @@ async def get_provider_by_id(provider_id: str):
                 for program in programs
             ]
         }
-        print(provider_response)
         return ProviderWithPrograms(**provider_response)
     
     except HTTPException:
