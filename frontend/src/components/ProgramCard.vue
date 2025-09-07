@@ -4,8 +4,11 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 interface ProgramCardProps {
   title: string
   description: string
-  startDate: string
-  location: string
+  startDate?: string | null
+  location?: string | null
+  email?: string | null
+  phone?: string | null
+  websiteUrl?: string | null
 }
 
 defineProps<ProgramCardProps>()
