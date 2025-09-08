@@ -16,7 +16,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18'
+        node-version: '22'
         cache: 'npm'
         cache-dependency-path: './frontend/package-lock.json'
 
@@ -36,13 +36,13 @@ jobs:
     - name: Deploy to EC2
       run: |
         # Copy frontend build
-        scp -r frontend/dist/* ubuntu@${{ secrets.EC2_HOST }}:/var/www/your-app/frontend/
+        scp -r frontend/dist/* ubuntu@${{ secrets.EC2_HOST }}:/var/www/inner-sydney-voice/frontend/
         
         # Copy backend code
-        scp -r backend/* ubuntu@${{ secrets.EC2_HOST }}:/var/www/your-app/backend/
+        scp -r backend/* ubuntu@${{ secrets.EC2_HOST }}:/var/www/inner-sydney-voice/backend/
         
         # Copy deployment scripts
-        scp deploy-scripts/* ubuntu@${{ secrets.EC2_HOST }}:/var/www/your-app/
+        scp deploy-scripts/* ubuntu@${{ secrets.EC2_HOST }}:/var/www/inner-sydney-voice/
         
         # Execute deployment script on server
-        ssh ubuntu@${{ secrets.EC2_HOST }} 'bash /var/www/your-app/deploy.sh'
+        ssh ubuntu@${{ secrets.EC2_HOST }} 'bash /var/www/inner-sydney-voice/deploy.sh'
