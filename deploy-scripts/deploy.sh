@@ -21,8 +21,8 @@ pip install -r requirements.txt
 
 # Create or update environment file
 cat > .env << EOF
-SUPABASE_URL=${{ secrets.SUPABASE_URL }}
-SUPABASE_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+SUPABASE_URL=${SUPABASE_URL}
+SUPABASE_KEY=${SUPABASE_ANON_KEY}
 ENVIRONMENT=production
 EOF
 
