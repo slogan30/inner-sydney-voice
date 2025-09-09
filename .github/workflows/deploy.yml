@@ -37,6 +37,7 @@ jobs:
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
       run: |
         # Copy frontend build
         scp -r frontend/dist/* ubuntu@${{ secrets.EC2_HOST }}:/var/www/inner-sydney-voice/frontend/
@@ -48,4 +49,4 @@ jobs:
         scp deploy-scripts/* ubuntu@${{ secrets.EC2_HOST }}:/var/www/inner-sydney-voice/
         
         # Execute deployment script on server with environment variables
-        ssh ubuntu@${{ secrets.EC2_HOST }} "SUPABASE_URL='$SUPABASE_URL' SUPABASE_ANON_KEY='$SUPABASE_ANON_KEY' bash /var/www/inner-sydney-voice/deploy.sh"
+        ssh ubuntu@${{ secrets.EC2_HOST }} "SUPABASE_URL='$SUPABASE_URL' SUPABASE_ANON_KEY='$SUPABASE_ANON_KEY' SUPABASE_SERVICE_KEY='$SUPABASE_SERVICE_KEY' bash /var/www/inner-sydney-voice/deploy.sh"
