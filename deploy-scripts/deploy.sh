@@ -27,7 +27,7 @@ ENVIRONMENT=production
 EOF
 
 # Restart backend service
-sudo supervisorctl restart your-app-backend || sudo supervisorctl start your-app-backend
+sudo supervisorctl restart inner-sydney-voice-backend || sudo supervisorctl start inner-sydney-voice-backend
 
 # Restart Nginx
 sudo systemctl reload nginx
