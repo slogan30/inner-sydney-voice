@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import { useRouter } from 'vue-router'
 
 interface ProgramCardProps {
-  programId: string
+  programId?: string | null
   title: string
   description: string
   startDate?: string | null
@@ -13,11 +13,22 @@ interface ProgramCardProps {
   websiteUrl?: string | null
 }
 
-const props = defineProps<ProgramCardProps>()
+const props = withDefaults(defineProps<ProgramCardProps>(), {
+  programId: '',
+  title: '',
+  description: '',
+  startDate: null,
+  location: null,
+  email: null,
+  phone: null,
+  websiteUrl: null,
+})
 const router = useRouter()
 
 const handleClick = () => {
-  router.push(`/programs/${props.programId}`)
+  if (props.programId) {
+    router.push(`/programs/${props.programId}`)
+  }
 }
 </script>
 

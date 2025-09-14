@@ -29,7 +29,7 @@ onMounted(async () => {
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       <ProgramCard
-        v-for="program in programs"
+        v-for="program in programs.filter((p) => p.program_id)"
         :key="program.program_id"
         :program-id="program.program_id"
         :title="program.name ?? ''"
