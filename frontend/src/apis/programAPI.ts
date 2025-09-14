@@ -16,17 +16,17 @@ export type ProgramCreatePayload = {
 
 export const createProgramAPI = async (payload: ProgramCreatePayload): Promise<Program> => {
   console.log('createProgramAPI payload', payload)
-  const response = await apiClient.post('/api/programs', payload)
+  const response = await apiClient.post('/programs', payload)
   console.log('createProgramAPI response', response)
   return response.data
 }
 
 export const listProgramsAPI = async (): Promise<Program[]> => {
-  const response = await apiClient.get('/api/programs')
+  const response = await apiClient.get('/programs')
   return response.data
 }
 
 export const getProgramAPI = async (id: string): Promise<Program> => {
-  const response = await apiClient.get(`/api/programs/${id}`)
+  const response = await apiClient.get(`/programs/${id}`)
   return response.data
 }
