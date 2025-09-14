@@ -37,7 +37,7 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         source: "backend/*,frontend/dist/*"
         target: "/var/www/inner-sydney-voice"
-        rm: true
+        rm: false
 
     # Setup and restart services
     - name: Setup backend and restart services
