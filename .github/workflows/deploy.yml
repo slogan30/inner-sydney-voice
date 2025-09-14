@@ -1,0 +1,66 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    # Build frontend locally
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '22'
+
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm ci
+        npm run build
+      env:
+        VITE_API_URL: https://innersydneyvoice.app/api
+        VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+        VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+    # Deploy to EC2
+    - name: Deploy files to EC2
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        source: "backend/*,frontend/dist/*"
+        target: "/var/www/inner-sydney-voice"
+        rm: true
+
+    # Setup and restart services
+    - name: Setup backend and restart services
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          # Create .env file
+          echo "${{ secrets.ENV_FILE }}" > /var/www/inner-sydney-voice/backend/.env
+          chmod 600 /var/www/inner-sydney-voice/backend/.env
+
+          # Install Python dependencies
+          cd /var/www/inner-sydney-voice/backend
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+          # Restart services
+          sudo systemctl restart fastapi
+          sudo systemctl reload nginx
+
+          # Wait for health check
+          sleep 5
+          curl -f http://localhost:8000/health || exit 1
