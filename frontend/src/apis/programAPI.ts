@@ -7,7 +7,8 @@ export type ProgramCreatePayload = {
   start_date?: string
   end_date?: string
   date_interval?: string
-  location?: string
+  place_id?: string
+  address?: string
   phone?: string
   email?: string
   website_url?: string

@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 from routes.program_routes import router as program_router
 from routes.provider_routes import router as provider_router
+from routes.user_routes import router as user_router
 
 load_dotenv()
 app = FastAPI()
@@ -22,6 +23,7 @@ app.add_middleware(
 
 app.include_router(program_router)
 app.include_router(provider_router)
+app.include_router(user_router)
 
 @app.get("/")
 async def read_root():

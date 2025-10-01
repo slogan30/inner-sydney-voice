@@ -16,9 +16,14 @@ import { Label } from '@/components/ui/label/index'
 import { Textarea } from '@/components/ui/textarea/index'
 import { useProviderStore } from '@/stores/providerStore'
 import { useProgramStore } from '@/stores/programStore'
+import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete.vue'
 
 const isDialogOpen = ref(false)
 const isSubmitting = ref(false)
+const selectedPlace = ref<{
+  placeId: string
+  address: string
+} | null>(null)
 
 // Minimal form state (no submit logic yet)
 const formData = ref({
@@ -27,7 +32,8 @@ const formData = ref({
   start_date: '',
   end_date: '',
   date_interval: '',
-  location: '',
+  place_id: '',
+  address: '',
   phone: '',
   email: '',
   website_url: '',
@@ -49,6 +55,13 @@ async function onSubmit() {
   try {
     isSubmitting.value = true
     const payload = { ...formData.value }
+
+    // Add place data if a place was selected
+    if (selectedPlace.value) {
+      payload.place_id = selectedPlace.value.placeId
+      payload.address = selectedPlace.value.address
+    }
+
     // Convert empty strings to undefined to let backend exclude None
     Object.keys(payload).forEach((k) => {
       const key = k as keyof typeof payload
@@ -57,8 +70,10 @@ async function onSubmit() {
         payload[key] = undefined
       }
     })
+
     await programStore.createProgram(payload as any)
     isDialogOpen.value = false
+
     // Reset form
     formData.value = {
       name: '',
@@ -66,15 +81,21 @@ async function onSubmit() {
       start_date: '',
       end_date: '',
       date_interval: '',
-      location: '',
+      place_id: '',
+      address: '',
       phone: '',
       email: '',
       website_url: '',
       provider_id: '',
     }
+    selectedPlace.value = null
   } finally {
     isSubmitting.value = false
   }
+}
+
+function onPlaceSelected(place: { placeId: string; address: string }) {
+  selectedPlace.value = place
 }
 </script>
 
@@ -129,13 +150,18 @@ async function onSubmit() {
         </div>
 
         <div class="grid grid-cols-4 items-center gap-4">
-          <Label for="location" class="text-right">Location</Label>
-          <Input
-            id="location"
-            v-model="formData.location"
-            class="col-span-3"
-            placeholder="Program location"
-          />
+          <Label for="address" class="text-right">Address</Label>
+          <div class="col-span-3">
+            <GooglePlacesAutocomplete
+              v-model="selectedPlace"
+              label=""
+              placeholder="Search for an address..."
+              @place-selected="onPlaceSelected"
+            />
+            <div v-if="selectedPlace" class="mt-2 text-xs text-muted-foreground">
+              {{ selectedPlace.address }}
+            </div>
+          </div>
         </div>
 
         <div class="grid grid-cols-4 items-center gap-4">

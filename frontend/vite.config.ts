@@ -10,7 +10,16 @@ export default defineConfig({
       plugins: [tailwind(), autoprefixer()],
     },
   },
-  plugins: [vue()],
+  plugins: [
+    vue({
+      template: {
+        compilerOptions: {
+          // Tell Vue to ignore gmp- prefixed custom elements
+          isCustomElement: (tag) => tag.startsWith('gmp-'),
+        },
+      },
+    }),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

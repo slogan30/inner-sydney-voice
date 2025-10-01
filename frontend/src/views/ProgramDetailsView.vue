@@ -126,8 +126,8 @@ const goToProvider = (providerId: string) => {
           </CardContent>
         </Card>
 
-        <!-- Location -->
-        <Card v-if="program.location">
+        <!-- Address -->
+        <Card v-if="program.address">
           <CardHeader>
             <CardTitle class="flex items-center">
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,11 +144,11 @@ const goToProvider = (providerId: string) => {
                   d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                 />
               </svg>
-              Location
+              Address
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p class="text-lg">{{ program.location }}</p>
+            <p class="text-lg">{{ program.address }}</p>
           </CardContent>
         </Card>
 

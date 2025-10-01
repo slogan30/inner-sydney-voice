@@ -1,5 +1,12 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
+import { useAuthStore } from '@/stores/authStore'
+import LoginDialog from './LoginDialog.vue'
+import SettingsDialog from './SettingsDialog.vue'
+import { ref } from 'vue'
+
+const authStore = useAuthStore()
+const isSettingsOpen = ref(false)
 </script>
 
 <template>
@@ -11,28 +18,42 @@ import { Button } from '@/components/ui/button'
 
     <!-- Navigation buttons -->
     <div class="flex items-center gap-4">
+      <RouterLink to="/calendar">
+        <Button variant="ghost">Calendar</Button>
+      </RouterLink>
+      <RouterLink to="/programs-map">
+        <Button variant="ghost">Programs Map</Button>
+      </RouterLink>
       <RouterLink to="/programs">
         <Button variant="ghost">Programs</Button>
       </RouterLink>
       <RouterLink to="/providers">
         <Button variant="ghost">Providers</Button>
       </RouterLink>
-      <Button variant="ghost" size="icon">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
-      </Button>
+
+      <!-- Conditional rendering based on authentication status -->
+      <template v-if="!authStore.isAuthenticated">
+        <LoginDialog mode="signin" trigger-text="Login/Signup" trigger-variant="default" />
+      </template>
+      <template v-else>
+        <Button variant="ghost" size="icon" @click="isSettingsOpen = true">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+        </Button>
+        <SettingsDialog v-model:open="isSettingsOpen" />
+      </template>
     </div>
   </nav>
 </template>

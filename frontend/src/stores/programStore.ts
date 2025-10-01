@@ -14,7 +14,8 @@ export interface Program {
   start_date?: string | null
   end_date?: string | null
   date_interval?: string | null
-  location?: string | null
+  place_id?: string | null
+  address?: string | null
   phone?: string | null
   email?: string | null
   website_url?: string | null

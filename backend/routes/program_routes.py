@@ -15,7 +15,8 @@ class ProgramCreate(BaseModel):
     start_date: Optional[date] = None
     end_date: Optional[date] = None
     date_interval: Optional[str] = None
-    location: Optional[str] = None
+    place_id: Optional[str] = None
+    address: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None
     website_url: Optional[str] = None
@@ -28,7 +29,8 @@ class Program(BaseModel):
     start_date: Optional[date] = None
     end_date: Optional[date] = None
     date_interval: Optional[str] = None
-    location: Optional[str] = None
+    place_id: Optional[str] = None
+    address: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None
     website_url: Optional[str] = None
@@ -40,6 +42,13 @@ class Program(BaseModel):
 @router.post("/api/programs", response_model=Program)
 async def create_program(program_data: ProgramCreate):
     try:
+        # Debug: Log the received program data
+        print(f"Backend - Received program data: {program_data}")
+        print(f"Backend - place_id value: {program_data.place_id}")
+        print(f"Backend - place_id type: {type(program_data.place_id)}")
+        print(f"Backend - place_id is None: {program_data.place_id is None}")
+        print(f"Backend - place_id == '': {program_data.place_id == ''}")
+        
         # Validate that provider exists if provider_id is provided
         if program_data.provider_id:
             provider_response = supabase_admin.table("providers").select("provider_id, name").eq("provider_id", program_data.provider_id).execute()
@@ -50,8 +59,15 @@ async def create_program(program_data: ProgramCreate):
                     detail=f"Provider with ID {program_data.provider_id} not found"
                 )
         
-        # Prepare data for insertion (exclude None values to let database handle defaults)
-        insert_data = program_data.model_dump(exclude_none=True)
+        # Prepare data for insertion - include all fields including place_id
+        insert_data = program_data.model_dump()
+        
+        # Remove None values but keep empty strings and other falsy values
+        insert_data = {k: v for k, v in insert_data.items() if v is not None}
+        
+        # Debug: Log the data being inserted
+        print(f"Backend - Insert data: {insert_data}")
+        print(f"Backend - place_id in insert_data: {insert_data.get('place_id')}")
 
         if 'start_date' in insert_data:
             insert_data['start_date'] = insert_data['start_date'].isoformat()
@@ -60,6 +76,11 @@ async def create_program(program_data: ProgramCreate):
         
         # Insert the new program
         response = supabase_admin.table("programs").insert(insert_data).execute()
+        
+        # Debug: Log the response
+        print(f"Backend - Insert response: {response}")
+        if response.data:
+            print(f"Backend - Created program: {response.data[0]}")
         
         # Check if the insertion was successful
         if response.data is None or not response.data:
