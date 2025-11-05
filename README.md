@@ -28,3 +28,7 @@ pip freeze > requirements.txt
 
 ## Install dependancies
 pip install -r requirements.txt
+
+## test
+
+pytest test_main.py -v

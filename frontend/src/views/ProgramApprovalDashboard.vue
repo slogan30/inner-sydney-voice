@@ -92,7 +92,7 @@ const approveProgram = async (programId: string) => {
       <Card v-for="program in unapprovedPrograms" :key="program.program_id" class="relative">
         <CardHeader>
           <div class="flex justify-between items-start">
-            <CardTitle class="text-2xl">Edit Program Details</CardTitle>
+            <CardTitle class="text-2xl">Edit Program Detailss</CardTitle>
             <Button
               @click="approveProgram(program.program_id)"
               class="bg-green-600 hover:bg-green-700 text-white"
