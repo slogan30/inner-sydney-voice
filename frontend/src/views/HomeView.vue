@@ -1,3 +1,3 @@
 <script setup lang="ts"></script>
 
-<template>Home Page</template>
+<template>Home Page!</template>
