@@ -18,18 +18,19 @@ const isSettingsOpen = ref(false)
 
     <!-- Navigation buttons -->
     <div class="flex items-center gap-4">
-      <RouterLink to="/calendar">
-        <Button variant="ghost">Calendar</Button>
-      </RouterLink>
-      <RouterLink to="/programs-map">
-        <Button variant="ghost">Programs Map</Button>
-      </RouterLink>
       <RouterLink to="/programs">
         <Button variant="ghost">Programs</Button>
       </RouterLink>
       <RouterLink to="/providers">
         <Button variant="ghost">Providers</Button>
       </RouterLink>
+
+      <!-- Show approval dashboard link for authenticated users -->
+      <template v-if="authStore.isAuthenticated">
+        <RouterLink to="/approval">
+          <Button variant="ghost">Approvals</Button>
+        </RouterLink>
+      </template>
 
       <!-- Conditional rendering based on authentication status -->
       <template v-if="!authStore.isAuthenticated">

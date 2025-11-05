@@ -20,6 +20,7 @@ interface ProgramCardProps {
   startDate?: string | null
   endDate?: string | null
   dateInterval?: string | null
+  repeatInterval?: number | null
   address?: string | null
   email?: string | null
   phone?: string | null
@@ -34,6 +35,7 @@ const props = withDefaults(defineProps<ProgramCardProps>(), {
   startDate: null,
   endDate: null,
   dateInterval: null,
+  repeatInterval: null,
   address: null,
   email: null,
   phone: null,
@@ -157,7 +159,15 @@ const handleSave = () => {
           <span class="text-sm text-muted-foreground">
             {{ startDate }}
             <template v-if="endDate"> - {{ endDate }}</template>
-            <template v-if="dateInterval"> • {{ dateInterval }}</template>
+            <template v-if="dateInterval">
+              •
+              <template v-if="repeatInterval">
+                {{ dateInterval }} ({{ repeatInterval }}x)
+              </template>
+              <template v-else>
+                {{ dateInterval }}
+              </template>
+            </template>
           </span>
         </div>
 

@@ -55,6 +55,10 @@ const handleSignOut = async () => {
                 <label class="text-sm font-medium">Email</label>
                 <p class="text-sm text-foreground">{{ authStore.user.email }}</p>
               </div>
+              <div class="space-y-2">
+                <label class="text-sm font-medium">Role</label>
+                <p class="text-sm text-foreground">{{ authStore.profile?.role || 'user' }}</p>
+              </div>
 
               <Button @click="handleSignOut"> Sign Out </Button>
             </div>

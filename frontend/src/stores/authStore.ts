@@ -9,6 +9,7 @@ export interface Profile {
   email: string | null
   created_at: string | null
   provider_id: string | null
+  role: string | null
 }
 
 export const useAuthStore = defineStore('auth', () => {

@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
-import HomeView from '../views/HomeView.vue'
 import ProgramsView from '../views/ProgramsView.vue'
 import ProvidersView from '../views/ProvidersView.vue'
 import ProgramDetailsView from '../views/ProgramDetailsView.vue'
 import ProviderDetailsView from '../views/ProviderDetailsView.vue'
 import ProgramsMapView from '../views/ProgramsMapView.vue'
 import CalendarView from '../views/CalendarView.vue'
+import ProgramApprovalDashboard from '../views/ProgramApprovalDashboard.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,7 +14,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView,
+      redirect: '/programs',
     },
     {
       path: '/programs',
@@ -35,6 +35,11 @@ const router = createRouter({
       path: '/calendar',
       name: 'calendar',
       component: CalendarView,
+    },
+    {
+      path: '/approval',
+      name: 'program-approval',
+      component: ProgramApprovalDashboard,
     },
     {
       path: '/programs/:id',
@@ -60,9 +65,6 @@ router.beforeEach(async (to, from, next) => {
 
   if (requiresAuth && !isAuthenticated) {
     next({ name: 'home' })
-  } else if (to.name === 'home' && isAuthenticated) {
-    // Auto redirect authenticated users from /home to /chat
-    next({ name: 'new-chat' })
   } else {
     next()
   }

@@ -7,10 +7,13 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, type Ref, computed } from 'vue'
 import { Loader } from '@googlemaps/js-api-loader'
+import { useRouter } from 'vue-router'
 
-// Define types for location with place ID
+// Define types for location with place ID and program name
 interface Location {
   placeId: string
+  programName: string
+  programId: string
 }
 
 // Template ref for the map container
@@ -29,15 +32,18 @@ import { useProgramStore } from '@/stores/programStore'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const google: any
 
+const router = useRouter()
 const programStore = useProgramStore()
 const { programs } = storeToRefs(programStore)
 
-// Extract locations with place IDs from programs
+// Extract locations with place IDs and program names from programs
 const locations = computed<Location[]>(() => {
   const locs = programs.value
     .filter((p) => p.place_id != null && p.place_id !== '')
     .map((p) => ({
       placeId: p.place_id!,
+      programName: p.name,
+      programId: p.program_id,
     }))
 
   console.log('ProgramsMapView - programs:', programs.value)
@@ -64,6 +70,7 @@ const initMap = async (): Promise<void> => {
       position: { lat: number; lng: number } | null
       map: unknown
       title?: string
+      content?: HTMLElement
     }) => MinimalMarker
   }
 
@@ -80,7 +87,7 @@ const initMap = async (): Promise<void> => {
   map = new google.maps.Map(mapContainer.value, {
     zoom: 12,
     center: sydneyCenter,
-    mapId: 'YOUR_MAP_ID_HERE',
+    mapId: import.meta.env.VITE_GOOGLE_MAPS_MAP_ID as string,
   })
 
   console.log('ProgramsMapView - map created')
@@ -111,11 +118,24 @@ const initMap = async (): Promise<void> => {
 
         console.log(`ProgramsMapView - creating marker at position:`, position)
 
-        // Create marker at the place location
+        // Create custom marker element with Tailwind styling
+        const markerDiv = document.createElement('div')
+        markerDiv.className =
+          'bg-background text-foreground border border-border rounded-lg shadow-lg px-3 py-2 text-sm font-medium whitespace-nowrap cursor-pointer transition-transform hover:scale-105 marker-badge'
+        markerDiv.textContent = location.programName
+        markerDiv.setAttribute('role', 'button')
+        markerDiv.setAttribute('aria-label', `View ${location.programName}`)
+
+        // Add click event listener to navigate to program details
+        markerDiv.addEventListener('click', () => {
+          router.push(`/programs/${location.programId}`)
+        })
+
+        // Create marker at the place location with custom content
         const marker = new AdvancedMarkerElement({
           position: position,
           map: map,
-          title: place.displayName || `Location ${index + 1}`,
+          content: markerDiv,
         })
         markers.push(marker)
 
@@ -136,7 +156,8 @@ const initMap = async (): Promise<void> => {
   // Fit map to show all markers
   if (hasValidLocation && map instanceof google.maps.Map) {
     console.log('ProgramsMapView - fitting bounds to markers')
-    map.fitBounds(bounds)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(map as any).fitBounds(bounds)
   } else {
     console.log('ProgramsMapView - no valid locations found, showing default center')
   }
@@ -146,7 +167,7 @@ const initMap = async (): Promise<void> => {
 
 const clearMarkers = (): void => {
   markers.forEach((marker) => {
-    marker.map = null
+    ;(marker as { map: unknown | null }).map = null
   })
   markers = []
 }
@@ -180,5 +201,43 @@ onUnmounted(() => {
   height: 500px;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom marker badge styling with pointer */
+:deep(.marker-badge) {
+  position: relative;
+  max-width: 250px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* Downward-pointing triangle to anchor badge to location */
+:deep(.marker-badge::after) {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid hsl(var(--background));
+  filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.1));
+}
+
+/* Add border to the pointer triangle */
+:deep(.marker-badge::before) {
+  content: '';
+  position: absolute;
+  bottom: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 9px solid hsl(var(--border));
+  z-index: -1;
 }
 </style>

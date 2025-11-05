@@ -1,9 +1,5 @@
 # My Project
 
-A full-stack application with FastAPI backend and Vue.js/React frontend.
-
-## 🚀 Quick Start
-
 ### Prerequisites
 - Python 3.11+
 - Node.js 22+
@@ -15,7 +11,20 @@ A full-stack application with FastAPI backend and Vue.js/React frontend.
 3. Frontend setup (frontend/README.md)
 4. Run both servers
 
+# Run Frontend:
+
+cd frontend
+npm run dev
+
 
 # Run Backend:
 
+cd backend
+source venv/bin/activate
 python -m uvicorn main:app --reload
+
+## Capture dependancies
+pip freeze > requirements.txt
+
+## Install dependancies
+pip install -r requirements.txt

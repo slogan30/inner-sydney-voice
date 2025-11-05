@@ -114,9 +114,15 @@ const configureAutocomplete = (): void => {
       fields: ['id', 'displayName', 'formattedAddress', 'location'],
     })
 
-    // Create location data object
+    console.log('GooglePlacesAutocomplete - place object:', place)
+    console.log('GooglePlacesAutocomplete - place.id:', place.id)
+    console.log('GooglePlacesAutocomplete - placePrediction:', placePrediction)
+    console.log('GooglePlacesAutocomplete - placePrediction.placeId:', placePrediction.placeId)
+
+    // Use placePrediction.placeId for the proper place ID (starts with ChIJ)
+    // place.id returns an encoded ID that doesn't work with Places API (New)
     const locationData: LocationData = {
-      placeId: place.id || '',
+      placeId: placePrediction.placeId || place.id || '',
       address: place.formattedAddress || '',
     }
 

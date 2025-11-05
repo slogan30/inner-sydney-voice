@@ -4,6 +4,8 @@ import { storeToRefs } from 'pinia'
 import ProgramCard from '@/components/ProgramCard.vue'
 import { useProgramStore } from '@/stores/programStore'
 import ProgramDialog from '@/components/ProgramDialog.vue'
+import { Button } from '@/components/ui/button'
+import { Calendar, Map } from 'lucide-vue-next'
 
 // Use the store
 const programStore = useProgramStore()
@@ -24,7 +26,21 @@ onMounted(async () => {
         </p>
       </div>
 
-      <ProgramDialog />
+      <div class="flex items-center gap-2">
+        <RouterLink to="/calendar">
+          <Button variant="outline">
+            <Calendar :size="20" class="mr-2" />
+            Calendar
+          </Button>
+        </RouterLink>
+        <RouterLink to="/programs-map">
+          <Button variant="outline">
+            <Map :size="20" class="mr-2" />
+            Map
+          </Button>
+        </RouterLink>
+        <ProgramDialog />
+      </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -37,6 +53,7 @@ onMounted(async () => {
         :start-date="program.start_date ?? ''"
         :end-date="program.end_date ?? ''"
         :date-interval="program.date_interval ?? ''"
+        :repeat-interval="program.repeat_interval ?? null"
         :address="program.address ?? ''"
         :email="program.email"
         :phone="program.phone"

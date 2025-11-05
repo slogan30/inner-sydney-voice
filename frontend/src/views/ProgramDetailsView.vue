@@ -121,7 +121,16 @@ const goToProvider = (providerId: string) => {
             </div>
             <div v-if="program.date_interval">
               <p class="text-sm font-medium text-muted-foreground">Schedule</p>
-              <p class="text-lg">{{ program.date_interval }}</p>
+              <p class="text-lg">
+                <template v-if="program.repeat_interval">
+                  {{ program.date_interval }} ({{ program.repeat_interval }} session{{
+                    program.repeat_interval > 1 ? 's' : ''
+                  }})
+                </template>
+                <template v-else>
+                  {{ program.date_interval }}
+                </template>
+              </p>
             </div>
           </CardContent>
         </Card>

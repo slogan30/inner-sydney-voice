@@ -11,10 +11,12 @@ router = APIRouter()
 
 class ProgramCreate(BaseModel):
     name: str
+    category: Optional[str] = None
     description: Optional[str] = None
     start_date: Optional[date] = None
     end_date: Optional[date] = None
     date_interval: Optional[str] = None
+    repeat_interval: Optional[int] = None
     place_id: Optional[str] = None
     address: Optional[str] = None
     phone: Optional[str] = None
@@ -22,13 +24,31 @@ class ProgramCreate(BaseModel):
     website_url: Optional[str] = None
     provider_id: Optional[str] = None
 
-class Program(BaseModel):
-    program_id: str
-    name: str
+class ProgramUpdate(BaseModel):
+    name: Optional[str] = None
+    category: Optional[str] = None
     description: Optional[str] = None
     start_date: Optional[date] = None
     end_date: Optional[date] = None
     date_interval: Optional[str] = None
+    repeat_interval: Optional[int] = None
+    place_id: Optional[str] = None
+    address: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    website_url: Optional[str] = None
+    provider_id: Optional[str] = None
+    is_approved: Optional[bool] = None
+
+class Program(BaseModel):
+    program_id: str
+    name: str
+    category: Optional[str] = None
+    description: Optional[str] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    date_interval: Optional[str] = None
+    repeat_interval: Optional[int] = None
     place_id: Optional[str] = None
     address: Optional[str] = None
     phone: Optional[str] = None
@@ -36,6 +56,7 @@ class Program(BaseModel):
     website_url: Optional[str] = None
     provider_id: Optional[str] = None
     provider_name: Optional[str] = None
+    is_approved: Optional[bool] = None
 
 
 
@@ -186,4 +207,72 @@ async def get_program(program_id: str):
         raise HTTPException(
             status_code=500, 
             detail="Internal server error while fetching program"
+        )
+
+
+@router.put("/api/programs/{program_id}", response_model=Program)
+async def update_program(program_id: str, program_data: ProgramUpdate):
+    try:
+        # Check if program exists
+        existing_program = supabase_admin.table("programs").select("*").eq("program_id", program_id).execute()
+        
+        if not existing_program.data:
+            raise HTTPException(status_code=404, detail=f"Program with ID {program_id} not found")
+        
+        # Validate that provider exists if provider_id is being updated
+        if program_data.provider_id:
+            provider_response = supabase_admin.table("providers").select("provider_id, name").eq("provider_id", program_data.provider_id).execute()
+            
+            if not provider_response.data:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Provider with ID {program_data.provider_id} not found"
+                )
+        
+        # Prepare data for update - only include fields that were provided
+        update_data = program_data.model_dump(exclude_unset=True)
+        
+        # Convert date objects to ISO format strings
+        if 'start_date' in update_data and update_data['start_date']:
+            update_data['start_date'] = update_data['start_date'].isoformat()
+        if 'end_date' in update_data and update_data['end_date']:
+            update_data['end_date'] = update_data['end_date'].isoformat()
+        
+        # Update the program
+        response = supabase_admin.table("programs").update(update_data).eq("program_id", program_id).execute()
+        
+        if not response.data:
+            raise HTTPException(status_code=500, detail="Failed to update program")
+        
+        # Fetch the updated program with provider information
+        program_response = supabase_admin.table("programs").select(
+            "*, providers(provider_id, name)"
+        ).eq("program_id", program_id).execute()
+        
+        if not program_response.data:
+            raise HTTPException(status_code=500, detail="Failed to fetch updated program")
+        
+        program_dict = dict(program_response.data[0])
+        
+        # Handle provider name
+        if program_dict.get('providers'):
+            program_dict['provider_name'] = program_dict['providers']['name']
+            del program_dict['providers']
+        else:
+            program_dict['provider_name'] = None
+        
+        return Program(**program_dict)
+    
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
+    except Exception as e:
+        # Log the error for debugging
+        print(f"Error updating program {program_id}: {str(e)}")
+        print(traceback.format_exc())
+        
+        # Return appropriate HTTP error
+        raise HTTPException(
+            status_code=500, 
+            detail="Internal server error while updating program"
         )
